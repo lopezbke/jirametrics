@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
+    <link defer rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@picocss/pico@2/css/pico.green.min.css">
+    <script defer>
+        document.addEventListener('alpine:init', () => {
+            Alpine.data('app', () => ({
+                // Theme functionality
+                theme: 'dark',
+                initializeTheme() {
+                    const storedTheme = localStorage.getItem('theme');
+                    if (storedTheme) {
+                        this.theme = storedTheme;
+                    } else {
+                        localStorage.setItem('theme', this.theme);
+                    }
+                    console.log(`Setting theme to ${this.theme}`)
+                    document.documentElement.setAttribute('data-theme', this.theme);
+                },
+                toggleTheme() {
+                    this.theme = this.theme === 'light' ? 'dark' : 'light';
+                },
+                // Modal functionality
+                isOpen: false,
+                toggleModal() {
+                    const modal = this.$refs.settingsModal;
+                    const themeToggle = this.$refs.themeToggle
+                    if (modal.hasAttribute('open')) {
+                        modal.removeAttribute('open');
+                        modal.setAttribute('close', true);
+                    } else {
+                        modal.removeAttribute('close');
+                        modal.setAttribute('open', true);
+                        const storedTheme = localStorage.getItem('theme');
+                        if (storedTheme) {
+                            console.log(storedTheme)
+                            this.theme = storedTheme;
+                        }
+
+                        if (themeToggle.checked && this.theme === "light") {
+                            themeToggle.checked = false;
+                        }
+                        if (themeToggle.checked === false && this.theme === "dark") {
+                            themeToggle.checked = true;
+                        }
+                    }
+                },
+                saveSettings() {
+                    const modal = this.$refs.settingsModal;
+                    modal.removeAttribute('open');
+                    modal.setAttribute('close', true);
+
+                    localStorage.setItem('theme', this.theme);
+                    document.documentElement.setAttribute('data-theme', this.theme);
+
+                },
+            }))
+        })
+    </script>
+    <title>Scrum Tools</title>
+</head>
+
+<body x-data="app" x-init="initializeTheme()">
+    <dialog x-ref="settingsModal" id="settings_modal" close>
+        <article>
+            <h2>Settings</h2>
+            <p>These settings will be saved for each user in the browsers local storage.</p>
+            <form>
+                <input type="text" name="project" placeholder="Project Name..." />
+                <input type="text" name="team" placeholder="Team number in Jira..." />
+                <input type="text" name="board_name" placeholder="Scrum Board Name..." />
+                <fieldset>
+                    <label>
+                        <input x-ref="themeToggle" name="theme-toggle" type="checkbox" role="switch" checked
+                            @click="toggleTheme()" />
+                        Dark Theme
+                    </label>
+                </fieldset>
+            </form>
+            <footer>
+                <button type="button" class="secondary" @click="toggleModal">Cancel</button>
+                <button type="button" @click="saveSettings">Confirm</button>
+            </footer>
+        </article>
+    </dialog>
+
+    <nav style="border-bottom: 1px solid;">
+        <ul>
+            <li style="margin-left: 20px;"><strong>Scrum Tools</strong></li>
+        </ul>
+        <ul>
+            <li><a href="#" class="secondary">Resources</a></li>
+            <li><a href="#" class="secondary">About</a></li>
+            <li><a href="#" @click.prevent="toggleModal">Settings</a></li>
+            <li>
+                <details class="dropdown" style="padding: 10px;">
+                    <summary>Dashboard Selection</summary>
+                    <ul dir="rtl">
+                        <li><a href="#">Team Performance</a></li>
+                        <li><a href="#">Sprint Metrics</a></li>
+                        <li><a href="#">Backlog Insight</a></li>
+                    </ul>
+                </details>
+            </li>
+        </ul>
+    </nav>
+
+    <br />
+
+    <div class="grid">
+        <div>
+            <table>
+                <thead>
+                    <tr></tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <th scope="row">Project Name</th>
+                        <td>Placeholder</td>
+                    </tr>
+                    <tr>
+                        <th scope="row">Team Number in Jira</th>
+                        <td>Placeholder</td>
+                    </tr>
+                    <tr>
+                        <th scope="row">Board Name</th>
+                        <td>Placeholder</td>
+                    </tr>
+                    <tr x-data="{ today: new Date().toLocaleDateString() }">
+                        <th scope="row">Update Date</th>
+                        <td><span x-text="today"></span></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        <div></div>
+    </div>
+
+    <div class="grid">
+        <div>
+            <table>
+                <thead>
+                    <tr>
+                        <th scope="col">Predictability</th>
+                        <th scope="col">Latest</th>
+                        <th scope="col">Prev(-1)</th>
+                        <th scope="col">Prev(-2)</th>
+                        <th scope="col">Trend</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <th scope="row">
+                            <p>Ready Sprints <br /><small>(Sum of story points expressed in Sprints)</small></p>
+                        </th>
+                        <td>0.0</td>
+                        <td>0.1</td>
+                        <td>0.0</td>
+                        <td>down</td>
+                    </tr>
+                    <tr>
+                        <th scope="row">
+                            <p>Velocity Variance <br /><small>(% Variation in last 3 Sprints)</small></p>
+                        </th>
+                        <td>0.0</td>
+                        <td>0.1</td>
+                        <td>0.0</td>
+                        <td>down</td>
+                    </tr>
+                    <tr>
+                        <th scope="row">
+                            <p>Velocity <br /><small>(Sum of Issues Points Delivered)</small></p>
+                        </th>
+                        <td>0.0</td>
+                        <td>0.1</td>
+                        <td>0.0</td>
+                        <td>down</td>
+                    </tr>
+                    <tr>
+                        <th scope="row">
+                            <p>Story Completion Ratio <br /><small>(Count of Issues Delivered / Count of Issues
+                                    Committed)</small></p>
+                        </th>
+                        <td>0.0</td>
+                        <td>0.1</td>
+                        <td>0.0</td>
+                        <td>down</td>
+                    </tr>
+                    <tr>
+                        <th scope="row">
+                            <p>Story Point Completion Ratio <br /><small>(Sum of Points Delivered / Sum Points
+                                    Committed)</small></p>
+                        </th>
+                        <td>0.0</td>
+                        <td>0.1</td>
+                        <td>0.0</td>
+                        <td>down</td>
+                    </tr>
+                    <tr>
+                        <th scope="row">
+                            <p>Staff Availability (%) <br /><small>Actual Staff Days / Available Staff Days</small></p>
+                        </th>
+                        <td>0.0</td>
+                        <td>0.1</td>
+                        <td>0.0</td>
+                        <td>down</td>
+                    </tr>
+                    <tr>
+                        <th scope="row">
+                            <p>Number of Items Blocked <br /><small>Count of Issues Currently Flagged</small></p>
+                        </th>
+                        <td>0.0</td>
+                        <td>0.1</td>
+                        <td>0.0</td>
+                        <td>down</td>
+                    </tr>
+                    <tr>
+                        <th scope="row">
+                            <p>Avg Days Blocked <br /><small>Sum of Days Flagged / Current # of Items Blocked</small>
+                            </p>
+                        </th>
+                        <td>0.0</td>
+                        <td>0.1</td>
+                        <td>0.0</td>
+                        <td>down</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        <div>
+            <h3 style="text-align: center;">What does this mean?</h3>
+        </div>
+    </div>
+</body>
+
+</html>
